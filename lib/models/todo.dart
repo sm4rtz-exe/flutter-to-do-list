@@ -3,18 +3,18 @@ class Todo {
   final String title;
   final String? description;
   final bool finished;
-  final DateTime dateCreated;
-  final DateTime? dueDate;
-  final DateTime? dateClosed;
+  final DateTime dateTimeCreated;
+  final DateTime? deadLine;
+  final DateTime? dateTimeClosed;
 
   Todo({
     required this.id,
     required this.title,
     this.description,
     this.finished = false,
-    required this.dateCreated,
-    this.dueDate,
-    this.dateClosed,
+    required this.dateTimeCreated,
+    this.deadLine,
+    this.dateTimeClosed,
   });
 
   // copyWith function is for creating a new Todo instance with some fields modified
@@ -23,18 +23,18 @@ class Todo {
     String? title,
     String? description,
     bool? finished,
-    DateTime? dateCreated,
-    DateTime? dueDate,
-    DateTime? dateClosed,
+    DateTime? dateTimeCreated,
+    DateTime? deadLine,
+    DateTime? dateTimeClosed,
   }) {
     return Todo(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       finished: finished ?? this.finished,
-      dateCreated: dateCreated ?? this.dateCreated,
-      dueDate: dueDate ?? this.dueDate,
-      dateClosed: dateClosed ?? this.dateClosed,
+      dateTimeCreated: dateTimeCreated ?? this.dateTimeCreated,
+      deadLine: deadLine ?? this.deadLine,
+      dateTimeClosed: dateTimeClosed ?? this.dateTimeClosed,
     );
   }
 
@@ -45,9 +45,9 @@ class Todo {
       'title': title,
       'description': description,
       'finished': finished ? 1 : 0,
-      'dateCreated': dateCreated.toIso8601String(),
-      'dueDate': dueDate?.toIso8601String(),
-      'dateClosed': dateClosed?.toIso8601String(),
+      'dateCreated': dateTimeCreated.toIso8601String(),
+      'deadLine': deadLine?.toIso8601String(),
+      'dateClosed': dateTimeClosed?.toIso8601String(),
     };
   }
 
@@ -60,11 +60,11 @@ class Todo {
       finished:
           map['finished'] ==
           1, //if the finished is 1 it's True but if it's not 1 it's False
-      dateCreated: DateTime.parse(map['dateCreated'] as String),
-      dueDate: map['dueDate'] != null
+      dateTimeCreated: DateTime.parse(map['dateCreated'] as String),
+      deadLine: map['dueDate'] != null
           ? DateTime.parse(map['dueDate'] as String)
           : null,
-      dateClosed: map['dateClosed'] != null
+      dateTimeClosed: map['dateClosed'] != null
           ? DateTime.parse(map['dateClosed'] as String)
           : null,
     );
