@@ -27,6 +27,7 @@ class DatabaseService {
     final databasePath = join(databaseDirPath, "todos_v1.db");
     final database = await openDatabase(
       databasePath,
+      version: 1,
       onCreate: (db, version) async {
         await db.execute('''CREATE TABLE $_tableName(
           $_id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -45,6 +46,7 @@ class DatabaseService {
   Future<void> addTask(Todo todo) async {
     final db = await database;
     await db.insert(_tableName, todo.toMap());
+    print("Task added");
   }
 
   Future<List<Todo>> getTasks() async {

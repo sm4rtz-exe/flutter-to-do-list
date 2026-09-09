@@ -119,6 +119,7 @@ class _TodoListHomeState extends State<TodoListHome> {
                   ),
                   MaterialButton(
                     onPressed: () async {
+                      print("Save button pressed");
                       if (_titleController.text.isNotEmpty) {
                         final newTodo = Todo(
                           id: 0,
@@ -127,8 +128,13 @@ class _TodoListHomeState extends State<TodoListHome> {
                           deadLine: _selectedDeadLine,
                           dateTimeCreated: DateTime.now(),
                         );
-                        await _databaseService.addTask(newTodo);
+                        try {
+                          await _databaseService.addTask(newTodo);
+                        } catch (e) {
+                          print(e);
+                        }
                         _clearInputs();
+                        setState(() {});
                         if (context.mounted) {
                           Navigator.pop(context);
                         }
@@ -151,7 +157,34 @@ class _TodoListHomeState extends State<TodoListHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("To Do List App")),
-      body: Column(children: []),
+      body: FutureBuilder<List<Todo>>(
+        future: _databaseService.getTasks(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            print("snapshot has error");
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text("No task yet", style: TextStyle(color: Colors.black)),
+            );
+          }
+
+          final tasks = snapshot.data!;
+          final todo = tasks.first;
+
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [Card(elevation: 4, child: Text(todo.title))],
+            ),
+          );
+        },
+      ),
       floatingActionButton: addTaskbutton(),
     );
   }
