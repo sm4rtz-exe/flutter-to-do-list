@@ -15,7 +15,7 @@ class _TodoListHomeState extends State<TodoListHome> {
   final TextEditingController _descController = TextEditingController();
   DateTime? _selectedDeadLine;
 
-  Future<void> _pickDateTime() async {
+  Future<void> _pickDateTime(StateSetter updateDialog) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
@@ -32,7 +32,7 @@ class _TodoListHomeState extends State<TodoListHome> {
 
     if (pickedTime == null) return;
 
-    setState(() {
+    updateDialog(() {
       _selectedDeadLine = DateTime(
         pickedDate.year,
         pickedDate.month,
@@ -66,78 +66,84 @@ class _TodoListHomeState extends State<TodoListHome> {
   }
 
   Widget form() {
-    return AlertDialog(
-      title: const Text('New Task'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _titleController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              label: Text("Title"),
-              hint: Text("Add your task"),
-            ),
-          ),
-          SizedBox(height: 12),
-          TextField(
-            controller: _descController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              label: Text("Description"),
-              hint: Text("Add your Description"),
-            ),
-          ),
-          SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+    return StatefulBuilder(
+      builder: (context, setDialogState) {
+        return AlertDialog(
+          title: const Text('New Task'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                onPressed: _pickDateTime,
-                icon: Icon(Icons.calendar_month),
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  label: Text("Title"),
+                  hint: Text("Add your task"),
+                ),
               ),
-              Text(
-                _selectedDeadLine == null
-                    ? "Set your dead line"
-                    : "${_selectedDeadLine!.day}/${_selectedDeadLine!.month}/${_selectedDeadLine!.year} ${_selectedDeadLine!.hour}:${_selectedDeadLine!.minute.toString().padLeft(2, '0')}",
+              SizedBox(height: 12),
+              TextField(
+                controller: _descController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  label: Text("Description"),
+                  hint: Text("Add your Description"),
+                ),
               ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              MaterialButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _clearInputs();
-                },
-                child: Text("Cancel"),
+              SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      await _pickDateTime(setDialogState);
+                    },
+                    icon: Icon(Icons.calendar_month),
+                  ),
+                  Text(
+                    _selectedDeadLine == null
+                        ? "Set your dead line"
+                        : "${_selectedDeadLine!.day}/${_selectedDeadLine!.month}/${_selectedDeadLine!.year} ${_selectedDeadLine!.hour}:${_selectedDeadLine!.minute.toString().padLeft(2, '0')}",
+                  ),
+                ],
               ),
-              MaterialButton(
-                onPressed: () async {
-                  if (_titleController.text.isNotEmpty) {
-                    final newTodo = Todo(
-                      id: 0,
-                      title: _titleController.text,
-                      description: _descController.text,
-                      deadLine: _selectedDeadLine,
-                      dateTimeCreated: DateTime.now(),
-                    );
-                    await _databaseService.addTask(newTodo);
-                    _clearInputs();
-                    if (context.mounted) {
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  MaterialButton(
+                    onPressed: () {
                       Navigator.pop(context);
-                    }
-                  }
-                },
-                textColor: Colors.white,
-                color: Theme.of(context).colorScheme.primary,
-                child: const Text("Save"),
+                      _clearInputs();
+                    },
+                    child: Text("Cancel"),
+                  ),
+                  MaterialButton(
+                    onPressed: () async {
+                      if (_titleController.text.isNotEmpty) {
+                        final newTodo = Todo(
+                          id: 0,
+                          title: _titleController.text,
+                          description: _descController.text,
+                          deadLine: _selectedDeadLine,
+                          dateTimeCreated: DateTime.now(),
+                        );
+                        await _databaseService.addTask(newTodo);
+                        _clearInputs();
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
+                      }
+                    },
+                    textColor: Colors.white,
+                    color: Theme.of(context).colorScheme.primary,
+                    child: const Text("Save"),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

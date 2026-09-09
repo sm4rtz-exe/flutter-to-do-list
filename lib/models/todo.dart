@@ -40,15 +40,18 @@ class Todo {
 
   // toMap function is for exporting Dart's data type to a standard format
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
+    final map = <String, dynamic>{
       'title': title,
       'description': description,
       'finished': finished ? 1 : 0,
-      'dateCreated': dateTimeCreated.toIso8601String(),
+      'dateTimeCreated': dateTimeCreated.toIso8601String(),
       'deadLine': deadLine?.toIso8601String(),
-      'dateClosed': dateTimeClosed?.toIso8601String(),
+      'dateTimeClosed': dateTimeClosed?.toIso8601String(),
     };
+    if (id != 0) {
+      map['id'] = id;
+    }
+    return map;
   }
 
   // fromMap function is for importing standard format to Dart's data type
@@ -60,12 +63,12 @@ class Todo {
       finished:
           map['finished'] ==
           1, //if the finished is 1 it's True but if it's not 1 it's False
-      dateTimeCreated: DateTime.parse(map['dateCreated'] as String),
-      deadLine: map['dueDate'] != null
-          ? DateTime.parse(map['dueDate'] as String)
+      dateTimeCreated: DateTime.parse(map['dateTimeCreated'] as String),
+      deadLine: map['deadLine'] != null
+          ? DateTime.parse(map['deadLine'] as String)
           : null,
-      dateTimeClosed: map['dateClosed'] != null
-          ? DateTime.parse(map['dateClosed'] as String)
+      dateTimeClosed: map['dateTimeClosed'] != null
+          ? DateTime.parse(map['dateTimeClosed'] as String)
           : null,
     );
   }

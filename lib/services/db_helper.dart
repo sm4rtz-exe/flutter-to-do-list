@@ -12,7 +12,7 @@ class DatabaseService {
   final String _finished = "finished";
   final String _dateTimeCreated = "dateTimeCreated";
   final String _deadLine = "deadLine";
-  final String _dateClosed = "dateClosed";
+  final String _dateTimeClosed = "dateTimeClosed";
 
   DatabaseService._constructor();
 
@@ -24,18 +24,19 @@ class DatabaseService {
 
   Future<Database> getDatabase() async {
     final databaseDirPath = await getDatabasesPath();
-    final databasePath = join(databaseDirPath, "master_db.db");
+    final databasePath = join(databaseDirPath, "todos_v1.db");
     final database = await openDatabase(
       databasePath,
-      onCreate: (db, version) => {
-        db.execute('''CREATE TABLE $_tableName(
-            $_id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            $_title TEXT NOT NULL, description TEXT, 
-            $_finished INTEGER NOT NULL, 
-            $_dateTimeCreated TEXT NOT NULL, 
-            $_deadLine TEXT, 
-            $_dateClosed Text
-            )'''),
+      onCreate: (db, version) async {
+        await db.execute('''CREATE TABLE $_tableName(
+          $_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          $_title TEXT NOT NULL, 
+          description TEXT, 
+          $_finished INTEGER NOT NULL, 
+          $_dateTimeCreated TEXT NOT NULL, 
+          $_deadLine TEXT, 
+          $_dateTimeClosed TEXT
+        )''');
       },
     );
     return database;
