@@ -56,4 +56,18 @@ class DatabaseService {
       return Todo.fromMap(e);
     }).toList();
   }
+
+  Future<void> finishTask(Todo todo) async {
+    final db = await database;
+    final updatedTodo = todo.copyWith(
+      finished: true,
+      dateTimeClosed: DateTime.now(),
+    );
+    await db.update(
+      _tableName,
+      updatedTodo.toMap(),
+      where: '$_id = ?',
+      whereArgs: [todo.id],
+    );
+  }
 }

@@ -156,7 +156,14 @@ class _TodoListHomeState extends State<TodoListHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("To Do List App")),
+      appBar: AppBar(
+        title: const Text("To Do List App"),
+        titleTextStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 22.5,
+          color: Colors.black,
+        ),
+      ),
       body: FutureBuilder<List<Todo>>(
         future: _databaseService.getTasks(),
         builder: (context, snapshot) {
@@ -174,14 +181,71 @@ class _TodoListHomeState extends State<TodoListHome> {
             );
           }
 
-          final tasks = snapshot.data!;
-          final todo = tasks.first;
+          final tasks = snapshot.data!.where((item) => !item.finished).toList();
 
-          return Padding(
+          if (tasks.isEmpty) {
+            return const Center(
+              child: Text("No task yet", style: TextStyle(color: Colors.black)),
+            );
+          }
+
+          return ListView.builder(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [Card(elevation: 4, child: Text(todo.title))],
-            ),
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final todo = tasks[index];
+              return Card(
+                elevation: 4,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 110,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                todo.title,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (todo.description != null &&
+                                  todo.description!.isNotEmpty)
+                                Text(todo.description!),
+                              Text(todo.deadLine.toString()),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () async {
+                                await _databaseService.finishTask(todo);
+                                setState(() {});
+                              },
+                              icon: Icon(Icons.check),
+                              color: Colors.green,
+                              iconSize: 32,
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.delete),
+                              color: Colors.red,
+                              iconSize: 32,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
