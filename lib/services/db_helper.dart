@@ -70,4 +70,9 @@ class DatabaseService {
       whereArgs: [todo.id],
     );
   }
+
+  Future<void> deleteTask(Todo todo) async {
+    final db = await database;
+    await db.delete(_tableName, where: '$_id = ?', whereArgs: [todo.id]);
+  }
 }
